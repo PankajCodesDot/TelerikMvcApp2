@@ -1,0 +1,323 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+Index
+
+@using Kendo.Mvc.UI;
+@using TelerikMvcApp2.ViewModel;
+
+@model TelerikMvcApp2.ViewModel.UserModel
+@{
+    ViewBag.Title = "GridShow";
+}
+
+
+
+
+@(Html.Kendo().Grid<UserModel>()
+            .Name("grid")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.id).Title("Id").Visible(false);
+                columns.Bound(c => c.name).Title("Name").Width(150);
+                columns.Bound(c => c.address).Title("Salary").Width(150).Filterable(false);
+               
+
+                columns.Command(command => command.Custom("Edit").Click("editDetails")).Title("Modify").Width(30);
+                columns.Command(c => { c.Destroy(); }).Title("Remove").Width(30);
+
+            }).HtmlAttributes(new { style = "height: 550px;" })
+                           .Sortable()
+                    .Filterable()
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .Model(model => model.Id(p => p.id))
+                .PageSize(5)
+                                                 .Create(update => update.Action("AddEmployee", "Home"))
+                                               .Update(update => update.Action("UpdateEmployee", "Home"))
+                                                .Read(read => read.Action("GetEmployees", "Home"))
+                                          .Destroy(destroy => destroy.Action("DeleteEmployee", "Home"))
+                )
+                 .Resizable(resize => resize
+                 .Columns(true)
+              )
+
+               .ToolBar(toolbar =>
+                {
+                    toolbar.Custom().Name("newAdd").Text("+ Add Employee ").Url("#").HtmlAttributes(new { id = "newAdd" });
+
+                })
+
+
+
+                .Pageable(pageable =>
+                {
+                    pageable.Refresh(true);
+                    pageable.PageSizes(true);
+                })
+)
+<div class="col-md-12">
+    @(Html.Kendo().Window().Name("AddDetails")
+        .Title("Add Employee")
+        .Visible(false)
+        .Modal(true)
+        .Content(@<text>
+            <div style="width:100%;" id="fieldlist">
+
+                <form id="Addform">
+                    <div id="save-container">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                @Html.Label("Name :", htmlAttributes: new { @class = "control-label" })
+                            </div>
+                            <div class="col-md-6">
+                                @(Html.Kendo().TextBox()
+                             .Name("txtName")
+                             .HtmlAttributes(new { placeholder = "Enter Name", required = "required", validationmessage = "*", maxlength = "50", @class = "col-sm-2 form-control", style = "width: 100%", })
+                                )
+                            </div>
+                            <div class="col-md-6">
+                                @Html.Label("Address :", htmlAttributes: new { @class = "control-label" })
+                            </div>
+                            <div class="col-md-6">
+                                @(Html.Kendo().TextBox()
+                             .Name("txtAddress")
+                             .HtmlAttributes(new { placeholder = "Enter Address", required = "required", validationmessage = "*", maxlength = "50", @class = "col-sm-2 form-control", style = "width: 100%" })
+                                )
+                            </div>
+                        </div>
+                        <div class="clarfix" style="height:35px"></div>
+                        <div class="col-md-12">
+                           
+                           
+
+
+                        <div class="row" style="margin-top:20px"></div>
+                        <div class="row" style="text-align:center;margin-top:10px;left:20px;">
+                            @(Html.Kendo().Button()
+                    .Name("btnSave")
+                    .Content("Save")
+                                    .HtmlAttributes(new { type = "button", @class = "k-button k-primary", style = "height:35px;width:70px;" })
+                    .Events(e => e.Click("btnSave_Click"))
+                            )
+                            @(Html.Kendo().Button()
+                    .Name("btnReset")
+                    .Content("Reset")
+                                    .HtmlAttributes(new { type = "button", @class = "k-button k-primary", style = "height:35px;width:70px;" })
+                    .Events(e => e.Click("btnReset_Click"))
+                            )
+                        </div>
+
+                    </div>
+                   </div>
+
+                </form>
+
+            </div>
+        </text>)
+        .Draggable(true) //Enable dragging of the window
+         .Actions(actions => actions.Pin().Minimize().Maximize().Close()).Resizable() //Enable resizing of the window
+         .Width(980)     //Set width of the window
+         .Height(300)
+
+    )
+
+
+</div>
+
+<div class="col-md-12">
+    @(Html.Kendo().Window().Name("EditDetails")
+        .Title("Edit Employee")
+        .Visible(false)
+        .Modal(true)
+        .Content(@<text>
+            <div style="width:100%;" id="fieldlist">
+
+                <form id="Editform">
+                    <div id="Update-container">
+                        <div class="col-md-12">
+                            @Html.Hidden("txtId")
+                            <div class="col-md-6">
+                                @Html.Label("Name :", htmlAttributes: new { @class = "control-label" })
+                            </div>
+                            <div class="col-md-6">
+                                @(Html.Kendo().TextBox()
+                             .Name("txtName1")
+                             .HtmlAttributes(new { placeholder = "Enter Name", required = "required", validationmessage = "*", maxlength = "50", @class = "col-sm-2 form-control", style = "width: 100%", })
+                                )
+                            </div>
+                            <div class="col-md-6">
+                                @Html.Label("Address :", htmlAttributes: new { @class = "control-label" })
+                            </div>
+                            <div class="col-md-6">
+                                @(Html.Kendo().TextBox()
+                             .Name("txtAddress1")
+                             .HtmlAttributes(new { placeholder = "Enter Address", required = "required", validationmessage = "*", maxlength = "50", @class = "col-sm-2 form-control", style = "width: 100%" })
+                                )
+                            </div>
+                        </div>
+                        <div class="clarfix" style="height:35px"></div>
+                        <div class="col-md-12">
+                           
+                           
+
+                            <div class="row" style="margin-top:20px"></div>
+                            <div class="row" style="text-align:center;margin-top:10px;left:20px;">
+                                @(Html.Kendo().Button()
+                    .Name("btnUpdate")
+                    .Content("Update")
+                                    .HtmlAttributes(new { type = "button", @class = "k-button k-primary", style = "height:35px;width:70px;" })
+                    .Events(e => e.Click("btnUpdate_Click"))
+                                )
+                                @(Html.Kendo().Button()
+                    .Name("btnUpdateReset")
+                    .Content("Reset")
+                                    .HtmlAttributes(new { type = "button", @class = "k-button k-primary", style = "height:35px;width:70px;" })
+                    .Events(e => e.Click("btnUpdateReset_Click"))
+                                )
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </text>)
+                                            .Draggable(true) //Enable dragging of the window
+                                             .Actions(actions => actions.Pin().Minimize().Maximize().Close()).Resizable() //Enable resizing of the window
+                                             .Width(980)     //Set width of the window
+                                             .Height(250)
+
+    )
+
+
+</div>
+<script>
+    $("#newAdd").click(function (e) {
+        debugger
+        e.preventDefault();
+        $("#AddDetails").data("kendoWindow").center().open();
+        $("#newAdd").show();
+        $("#btnSave").kendoButton({}).data("kendoButton").enable(true);
+
+    });
+
+    function btnSave_Click() {
+        debugger
+        var validator = $("#save-container").kendoValidator().data("kendoValidator");
+        if (validator.validate()) {
+
+            var employeeModel = {
+                Name: $('#txtName').val(),
+                Address: $('#txtAddress').val(),
+               
+
+            }
+            var model = {
+                "emp": employeeModel
+            }
+            $.ajax({
+                type: "POST",
+                url: '/Home/AddEmployee', data: model,
+                datatype: "json",
+                cache: false,
+                success: function (data) {
+
+                },
+
+            });
+            btnReset_Click();
+            var wnd = $("#AddDetails").data("kendoWindow");
+            wnd.center().close();
+            alert("Record save is successfully!");
+            var grid = $('#grid').data('kendoGrid');
+            grid.dataSource.read();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+
+    function editDetails(e) {
+        debugger
+        e.preventDefault();
+        var wnd = $("#EditDetails").data("kendoWindow");
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        $("#txtId").val(dataItem.id);
+        $("#txtName1").val(dataItem.name);
+        $('#txtAddress1').val(dataItem.address);
+
+        $("#btnUpdate").kendoButton({}).data("kendoButton").enable(true);
+        wnd.center().open();
+    }
+
+    function btnReset_Click() {
+        debugger
+       
+
+        $("#txtName").val("")
+        $('#txtAddress').val("");
+
+
+        $("#btnSave").kendoButton({}).data("kendoButton").enable(true);
+        var wnd = $("#AddDetails").data("kendoWindow");
+        wnd.element.find("span.k-tooltip-validation").hide();
+        return;
+    }
+    function btnUpdateReset_Click() {
+        debugger
+
+        var Id = $("#txtId1").val();
+        var dataItem = $("#grid").data("kendoGrid").dataSource.get(Id);
+       
+        $("#txtName1").val(dataItem.Name)
+        $("#txtAddress1").val(dataItem.Salary)
+
+        $("#btnUpdate").kendoButton({}).data("kendoButton").enable(true);
+        return;
+    }
+
+    function btnUpdate_Click() {
+        debugger
+        var validator = $("#Update-container").kendoValidator().data("kendoValidator");
+        if (validator.validate()) {
+
+            var employeeModel = {
+                Id: $("#txtId").val(),
+                Name: $('#txtName1').val(),
+                Address: $('#txtAddress1').val(),
+              
+
+            }
+            var model = {
+                "emp": employeeModel
+            }
+            $.ajax({
+                type: "POST",
+                url: '/Home/UpdateEmployee', data: model,
+                datatype: "json",
+                cache: false,
+                success: function (data) {
+
+                },
+
+            });
+            btnReset_Click();
+            var wnd = $("#EditDetails").data("kendoWindow");
+            wnd.center().close();
+            alert("Record updated successfully!");
+            var grid = $('#grid').data('kendoGrid');
+            grid.dataSource.read();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+</script>
